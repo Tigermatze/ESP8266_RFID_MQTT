@@ -10,17 +10,28 @@ Ich habe mich für dieses Board entschieden, weil es sehr klein ist und ich es n
 ### RFID-RC522
 Dieses Modul sowie zwei RFID-Tags waren Bestandteil eines Arduino Einsteigerkastens.
 Wenn ein Tag vor das Lesegerät gehalten wird, dann wird der Code des Tags ausgelesen und kann verarbeitet werden.
-![RFID_Tags](https://github.com/Tigermatze/ESP8266_RFID_MQTT/assets/45244783/e28cbd86-0240-4321-9d39-74f1495bb726)
-<img RFID_Pins-q7ndmwl6f40dbbfnvzeblqxq1v43y6eehg3gw261ho.webp>
+<img alt="RFID TAG" src="https://github.com/Tigermatze/ESP8266_RFID_MQTT/assets/45244783/e28cbd86-0240-4321-9d39-74f1495bb726" width="40%"/>
+
+<img alt="RFID Pins" src="https://github.com/Tigermatze/ESP8266_RFID_MQTT/assets/45244783/3d77ac0f-b2cb-4c08-be4e-fba1fa5af0ef" />
 
 ### MQTT
 Als Smarthome Zentrale habe ich openhab laufen und alle Elemnte sind auch mit MQTT Kommandos ansteuerbar. Da dies einfach umzusetzen ist, werden wir das Protokoll auch hier verwenden.
 
 ## Anschluss & IDE
 ### Anschluss
-Hier ist der Anschluss der Board dargestellt.
-<img RFID_Wemos_D1_Mini.webp>
-<img RFID_Anschluss_Wemos_D1.webp>
+Hier ist der Anschluss der Board dargestellt.\
+<img alt="RFID_Wemos_D1_Mini" src="https://github.com/Tigermatze/ESP8266_RFID_MQTT/assets/45244783/e3f1fe85-8f4e-4fd8-bb20-a9bbad68554c" />
+
+|RC522 | ESP |
+|-----------|-------|
+| SDA | D8 |
+| SCK | D5 |
+| MOSI | D7 |
+| MISO | D6 |
+| IRQ | - |
+| GND | GND |
+| RST | D3 |
+| 3.3V | 3.3V |
 
 ### IDE
 Als IDE verwende ich Visual Studio Code (VSC) und die Erweiterung PlatformIO.
