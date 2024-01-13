@@ -48,3 +48,6 @@ Wie ihr seht hat PlatformIO für uns eine Ordnerstruktur angelegt und auch gleic
 ##### Bibliothek installieren
 Zum nutzen des RFID Moduls installieren wir die Bibliothek MFRC522 ("miguelbalboa/MFRC522@^1.4.11"). Dazu in PIO Home auf Libraries gehen, die Bibliothek suchen und dem Projekt hinzufügen.
 
+# Quellen & Verweise
+[Zugriff auf Transponder](https://elektro.turanis.de/html/prj102/index.html#ZugriffaufdenTransponder)
+[Alles über ESP](https://randomnerdtutorials.com/esp8266-pinout-reference-gpios/)
