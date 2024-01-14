@@ -15,14 +15,12 @@ This code will connect to an existing MQTT broker and will send a mqtt message t
 #include <ESP8266WiFi.h>
 #include <WiFiClient.h>
 #include <PubSubClient.h>
-#include <ArduinoOTA.h>
+#include <ArduinoJson.h>
 #include "main.h"
 
 // Setup RFID RC522
 #define RC522_SDA D8
 #define RC522_RST D3
-MFRC522 mfrc522(RC522_SDA, RC522_RST); // create an instance from class by calling a constructor.
-String rfid_old_value = "";
 
 // Setup WiFi
 const char* WiFi_ssid = "TempelWiFi";
@@ -37,8 +35,15 @@ const char* WiFi_password = "Tempe1@H0me";
 #define send_topic "Haus/Dachgeschoss/Mika/ESP8266/RFID"
 //#define send_string "RFID,Ausgangsort=Dachgeschoss,Sensorort=Mika,Sensor=ESP8266"
 #define send_string ""
+
+// create some instances
+MFRC522 mfrc522(RC522_SDA, RC522_RST); // create an instance from class by calling a constructor.
 WiFiClient espClient;
 PubSubClient mqtt_client(espClient);
+StaticJsonDocument<256> json_doc; // Allocate the JSON document
+
+// global variables
+boolean rfid_present_old = false;
 
 void setup() {
   Serial.begin(9600); 
@@ -59,9 +64,7 @@ void loop() {
   mqtt_client.loop();
 
   // if RFID tag detected, send mqtt message to the mqtt broker
-  if (is_RFID_present())
-    send_RFID_via_MQTT(send_topic, send_string);
-  
+  send_RFID_via_MQTT(send_topic, send_string);
 }
 
 void WiFi_connect(const char* ssid, const char* wifi_pass) {
@@ -98,7 +101,7 @@ void MQTT_reconnect(const char* user, const char* password, const char* topic)
     if (mqtt_client.connect(clientID.c_str(), user, password))
     {
       Serial.println("connected");
-      if (topic != "")
+      if (strcmp ("", topic) != 0)
         mqtt_client.subscribe(topic);
     }
     else
@@ -116,13 +119,45 @@ void MQTT_callback(char* topic, byte* message, unsigned int length)
 
 }
 
+void send_RFID_via_MQTT(const char* topic, const char* mqtt_string)
+{
+  boolean rfid_present = is_RFID_present();
+
+  // only send mqtt message if the tag changed  
+  if (rfid_present_old == rfid_present)
+    return;
+
+  String rfid_tag = get_RFID_value();
+  
+  // Add values in the document
+  json_doc["rfid_tag"] = rfid_tag;
+  json_doc["rfid_present"] = rfid_present;
+
+  char json_out[128];
+  serializeJson(json_doc, json_out);
+
+  if (!mqtt_client.publish(topic, json_out))
+    Serial.println("MQTT publishing not successfull!");
+  else 
+    Serial.println("MQTT message send");
+
+  rfid_present_old = rfid_present;
+}
+
 boolean is_RFID_present()
 {
-  // nur eine Aktion ausführen, wenn ein RFID Tag erkannt wurde
-  if (mfrc522.PICC_IsNewCardPresent())
-    return mfrc522.PICC_ReadCardSerial();
+  boolean return_value = false;
 
-  return false;
+  mfrc522.PCD_SoftPowerUp();
+  if (mfrc522.PICC_IsNewCardPresent())
+    if (mfrc522.PICC_ReadCardSerial())
+      return_value = true;
+
+  delay(200);
+  mfrc522.PCD_SoftPowerDown();
+  delay(500);
+
+  return return_value;
 }
 
 String get_RFID_value()
@@ -131,34 +166,7 @@ String get_RFID_value()
 
   for (byte i = 0; i < mfrc522.uid.size; i++) 
     value += String(mfrc522.uid.uidByte[i], DEC);
-  
-  //Serial.println(value);
 
   return value;
 }
 
-void send_RFID_via_MQTT(const char* topic, const char* mqtt_string)
-{
-  String rfid_value = "";
-  rfid_value = get_RFID_value();
-
-  // only send mqtt message if the tag changed  
-  if (rfid_old_value == rfid_value)
-    return;
-    
-  rfid_old_value = rfid_value;
-
-  String value = mqtt_string;
-  //value += " rfid_value=";
-  value += rfid_value;
-  
-  /*Serial.print("Topic: ");
-  Serial.println(topic);
-  Serial.print("mqtt_message: ");
-  Serial.println(value.c_str());*/
-  
-  if (!mqtt_client.publish(topic, value.c_str()))
-    Serial.println("MQTT publishing not successfull!");
-  else 
-    Serial.println("MQTT message send");
-}
