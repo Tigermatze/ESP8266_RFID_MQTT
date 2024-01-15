@@ -8,7 +8,7 @@ Ziel ist ein kleines Einsteigerprojekt um mit Hile eines RFID Tags am Eingang ei
 Ich habe mich für dieses Board entschieden, weil es sehr klein ist und ich es noch liegen hatte. Außerdem hat es die notwendigen Pins, einen seriellen Programmieradapter und Wifi, also alles was ich benötige.
 
 ### Systemübersicht
-<img alt="Systemuebersicht" src="https://github.com/Tigermatze/ESP8266_RFID_MQTT/assets/45244783/43571cf6-51ae-4cbd-9f35-620c5cc53840" width="40%"/>
+<img alt="Systemuebersicht" src="https://github.com/Tigermatze/ESP8266_RFID_MQTT/assets/45244783/43571cf6-51ae-4cbd-9f35-620c5cc53840" width="100%"/>
 
 Als Basis dient mein Server, auf dem die notwendigen Services (MQTT Broker, openhab, zigbee2mqtt) laufen. Openhab ist mein Hausautomatisierungs-System. \
 Der ESP8266 soll keinerlei Entscheidungen treffen, sondern die Informationen via MQTT Protokoll an openhab senden. In openhab erstelle ich die Regeln welche Lichter geschaltet werden sollen. Das hat den Vorteil, dass ich Änderungen flexibel vornehmen kann ohne jedesmal den ESP neu flashen zu müssen. \
@@ -16,8 +16,8 @@ Allgemein werden einige Lichter aktiviert solange ein RFID-Tag auf dem Leser lie
 
 ### RFID-RC522
 Dieses Modul sowie zwei RFID-Tags waren Bestandteil eines Arduino Einsteigerkastens.
-Wenn ein Tag vor das Lesegerät gehalten wird, dann wird der Code des Tags ausgelesen und kann verarbeitet werden.
-<img alt="RFID TAG" src="https://github.com/Tigermatze/ESP8266_RFID_MQTT/assets/45244783/e28cbd86-0240-4321-9d39-74f1495bb726" width="40%"/>
+Wenn ein Tag vor das Lesegerät gehalten wird, dann wird der Code des Tags ausgelesen und kann verarbeitet werden. \
+<img alt="RFID TAG" src="https://github.com/Tigermatze/ESP8266_RFID_MQTT/assets/45244783/e28cbd86-0240-4321-9d39-74f1495bb726" width="40%"/> \
 
 <img alt="RFID Pins" src="https://github.com/Tigermatze/ESP8266_RFID_MQTT/assets/45244783/3d77ac0f-b2cb-4c08-be4e-fba1fa5af0ef" />
 
