@@ -33,8 +33,7 @@ const char* WiFi_password = "Tempe1@H0me";
 #define mqtt_pwd ""
 #define subscribe_topic ""
 #define send_topic "Haus/Dachgeschoss/Mika/ESP8266/RFID"
-//#define send_string "RFID,Ausgangsort=Dachgeschoss,Sensorort=Mika,Sensor=ESP8266"
-#define send_string ""
+#define influxdb_string "RFID,Ausgangsort=Dachgeschoss,Sensorort=Mika,Sensor=ESP8266"
 
 // create some instances
 MFRC522 mfrc522(RC522_SDA, RC522_RST); // create an instance from class by calling a constructor.
@@ -56,15 +55,19 @@ void setup() {
 }
 
 void loop() {
+  
+
   // check if the connection to mqtt broker is still established, otherwise reconnet
   if (!mqtt_client.connected())
     MQTT_reconnect(mqtt_user, mqtt_pwd, subscribe_topic);
 
   // check and handle subscribed topics and so on
+  delay(1000);
+  yield();
   mqtt_client.loop();
 
   // if RFID tag detected, send mqtt message to the mqtt broker
-  send_RFID_via_MQTT(send_topic, send_string);
+  send_RFID_via_MQTT(send_topic, influxdb_string);
 }
 
 void WiFi_connect(const char* ssid, const char* wifi_pass) {
@@ -122,6 +125,7 @@ void MQTT_callback(char* topic, byte* message, unsigned int length)
 void send_RFID_via_MQTT(const char* topic, const char* mqtt_string)
 {
   boolean rfid_present = is_RFID_present();
+  String influxdb_value = mqtt_string;
 
   // only send mqtt message if the tag changed  
   if (rfid_present_old == rfid_present)
@@ -129,18 +133,28 @@ void send_RFID_via_MQTT(const char* topic, const char* mqtt_string)
 
   String rfid_tag = get_RFID_value();
   
+  // create JSON-Format 
   // Add values in the document
-  json_doc["rfid_tag"] = rfid_tag;
-  json_doc["rfid_present"] = rfid_present;
+  //json_doc["rfid_tag"] = rfid_tag;
+  //json_doc["rfid_present"] = rfid_present;
 
-  char json_out[128];
-  serializeJson(json_doc, json_out);
+  //char json_out[128];
+  //serializeJson(json_doc, json_out);
 
-  if (!mqtt_client.publish(topic, json_out))
-    Serial.println("MQTT publishing not successfull!");
+  // create influxdb Format
+  influxdb_value += " rfid_tag=";
+  influxdb_value += rfid_tag;
+  influxdb_value += ",rfid_available=";
+  influxdb_value += ((rfid_present == true)? "true" : "false");
+
+  //Serial.println(influxdb_value);
+  //(mqtt_client.publish(topic, json_out))
+
+  if (!mqtt_client.publish(topic, influxdb_value.c_str()))
+      Serial.println("MQTT publishing not successfull!");
   else 
     Serial.println("MQTT message send");
-
+  
   rfid_present_old = rfid_present;
 }
 
